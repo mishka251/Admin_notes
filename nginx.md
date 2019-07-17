@@ -11,15 +11,7 @@
 
 Вставляем конфиг, **с соответствующими изменениями для вашего сайта**:   
 
-`map $http_upgrade $connection_upgrade { 
-
-        default upgrade; 
-
-        ''      close; 
-
-    } 
-
-server { 
+`server { 
 
     listen 80; 
 
@@ -73,9 +65,9 @@ server {
 
        proxy_read_timeout 86400; 
 
-       proxy_set_header Upgrade $http_upgrade; 
+       proxy_set_header Upgrade websocket; 
 
-       proxy_set_header Connection $connection_upgrade; 
+       proxy_set_header Connection upgrade; 
 
     } 
 
@@ -83,7 +75,7 @@ server {
 
     uwsgi_read_timeout          1200; 
 
-} `
+}`
 
 Если не планируете работать с веб-сокетами - удаляйте последний location.  
 
