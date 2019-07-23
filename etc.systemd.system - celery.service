@@ -1,0 +1,34 @@
+[Unit]
+Description=Celery Service
+After=network.target
+
+[Service]
+Type=forking
+User=www-data
+Restart=always 
+
+#django project settings
+Environment="DJANGO_SETTINGS_MODULE=test1.settings" 
+
+#path to second config
+EnvironmentFile=/etc/conf.d/celery
+#path to django project manage.py file
+WorkingDirectory=/home/admin1/django_here/test1
+
+#create directory on start
+PermissionsStartOnly=true
+ExecStartPre=/bin/sh -c 'mkdir -p /run/celery/ && chown www-data /run/celery'
+
+ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
+ -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+
+ExecStop=/bin/sh -c '${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
+  --pidfile=${CELERYD_PID_FILE}'
+
+ExecReload=/bin/sh -c '${CELERY_BIN} multi restart ${CELERYD_NODES} \
+  -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+
+[Install]
+WantedBy=multi-user.target
